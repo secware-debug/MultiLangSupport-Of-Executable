@@ -14,10 +14,10 @@
 //#include <fstream>
 //#include <sstream>
 //#include <iomanip>
-//#include <imm.h>
+#include <imm.h>
 //#include <DbgHelp.h>
 
-//#pragma comment(lib, "Imm32.lib")
+#pragma comment(lib, "Imm32.lib")
 
 //#pragma comment(lib, "Ws2_32.lib")
 //#pragma comment(lib, "dbghelp.lib")
@@ -41,7 +41,7 @@ void write_log(const char* format, ...) {
 	fclose(log_file);  // Close the file
 }*/
 
-/*
+
 typedef HIMC(WINAPI* ImmAssociateContext_t)(HWND, HIMC);
 
 // Pointer to the original API
@@ -49,7 +49,7 @@ ImmAssociateContext_t TrueImmAssociateContext = nullptr;
 
 HIMC WINAPI HookedImmAssociateContext(HWND hWnd, HIMC hImc) {
 	// Log the event for debugging
-	OutputDebugStringA("ImmAssociateContext called!\n");
+	//OutputDebugStringA("ImmAssociateContext called!\n");
 
 	// Check if HIMC is being set to NULL (disabling the IME)
 	if (hImc == NULL) {
@@ -60,7 +60,7 @@ HIMC WINAPI HookedImmAssociateContext(HWND hWnd, HIMC hImc) {
 		// Check if the language is Chinese (0x0804 for Simplified, 0x0404 for Traditional)
 		if (primaryLanguage == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED) ||
 			primaryLanguage == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL)) {
-			OutputDebugStringA("Attempt to disable Chinese input method blocked.\n");
+		//	OutputDebugStringA("Attempt to disable Chinese input method blocked.\n");
 
 			// Return the current HIMC for the window to ensure it is not disabled
 			HIMC currentHimc = ImmGetContext(hWnd);
@@ -76,7 +76,7 @@ HIMC WINAPI HookedImmAssociateContext(HWND hWnd, HIMC hImc) {
 	return NULL; // If original function is not available, return NULL
 }
 
-
+/*
 
 typedef BOOL(WINAPI* ImmAssociateContextEx_t)(HWND, HIMC, DWORD);
 ImmAssociateContextEx_t TrueImmAssociateContextEx = nullptr;
@@ -406,9 +406,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 		// Install hooks for `send` and `recv`
 		//InstallHook("ws2_32.dll", "send", (LPVOID*)&TrueSend, HookedSend);
 		//InstallHook("ws2_32.dll", "recv", (LPVOID*)&TrueRecv, HookedRecv);
-		InstallHook("kernel32.dll", "MultiByteToWideChar", (LPVOID*)&TrueMultiByteToWideChar, HookedMultiByteToWideChar);
-		InstallHook("kernel32.dll", "WideCharToMultiByte", (LPVOID*)&TrueWideCharToMultiByte, HookedWideCharToMultiByte);
-		//InstallHook("imm32.dll", "ImmAssociateContext", (LPVOID*)&TrueImmAssociateContext, HookedImmAssociateContext);
+		InstallHook("kernel32.dll", "MultiByteToWideChar", (LPVOID*)&TrueMultiByteToWideChar, HookedMultiByteToWideChar); //For chinese code support
+		InstallHook("kernel32.dll", "WideCharToMultiByte", (LPVOID*)&TrueWideCharToMultiByte, HookedWideCharToMultiByte); //For chinese code support
+		InstallHook("imm32.dll", "ImmAssociateContext", (LPVOID*)&TrueImmAssociateContext, HookedImmAssociateContext); // For stopping change of input system while game running
 		//InstallHook("imm32.dll", "ImmAssociateContextEx", (LPVOID*)&TrueImmAssociateContextEx, HookedImmAssociateContextEx);
 		DetourTransactionCommit();
 		//StartLogging();
