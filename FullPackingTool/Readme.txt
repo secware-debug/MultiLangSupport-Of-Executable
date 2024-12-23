@@ -1,0 +1,1 @@
+This tool is from Brazil client and its primary role is to pack and unpack game client(DMO)'s resources.
